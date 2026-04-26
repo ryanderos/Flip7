@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip 7 Score Master</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+/* =============================================
+   DESIGN TOKENS — Flip 7 Dark Neon Theme
+   ============================================= */
+:root {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body:    'Nunito', sans-serif;
+
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+
+  --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
+
+  --radius-sm: 0.375rem; --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;  --radius-full: 9999px;
+
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --bg:           #0f0f14;
+  --surface:      #16151e;
+  --surface-2:    #1e1c2a;
+  --surface-3:    #252336;
+  --border:       rgba(255,255,255,0.08);
+  --text:         #e8e6f0;
+  --text-muted:   #8b89a0;
+  --text-faint:   #4a4860;
+
+  --primary:      #7c5cfc;
+  --primary-glow: rgba(124,92,252,0.35);
+  --accent:       #ff6b9d;
+  --accent-glow:  rgba(255,107,157,0.3);
+  --gold:         #ffd166;
+  --gold-glow:    rgba(255,209,102,0.3);
+  --teal:         #06d6a0;
+  --teal-glow:    rgba(6,214,160,0.3);
+  --orange:       #ff9f1c;
+  --red:          #ef476f;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+/* =============================================
+   BASE RESET
+   ============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: none; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100dvh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input { font: inherit; color: inherit; }
+ul { list-style: none; }
+
+/* =============================================
+   APP SHELL
+   ============================================= */
+#app { max-width: 900px; margin: 0 auto; padding: var(--space-4); }
+
+/* =============================================
+   HEADER
+   ============================================= */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-md);
+  gap: var(--space-4);
+}
+.logo { display: flex; align-items: center; gap: var(--space-3); }
+.logo-icon { width: 44px; height: 44px; flex-shrink: 0; }
+.logo-text {
+  font-family: var(--font-display);
+  font-size: var(--text-lg); font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.logo-sub { font-size: var(--text-xs); color: var(--text-muted); margin-top: -2px; }
+.header-actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
+.btn-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-lg);
+  background: var(--surface-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: all var(--transition); font-size: 1.1rem;
+}
+.btn-icon:hover { background: var(--surface-3); color: var(--text); }
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--space-2); padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-lg); font-size: var(--text-sm);
+  font-weight: 700; transition: all var(--transition);
+  border: 1px solid transparent; white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 0 20px var(--primary-glow); }
+.btn-primary:hover { background: #6a4ae0; box-shadow: 0 0 30px var(--primary-glow); }
+.btn-accent { background: var(--accent); color: #fff; box-shadow: 0 0 20px var(--accent-glow); }
+.btn-accent:hover { background: #e5557f; }
+.btn-outline { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-outline:hover { background: var(--surface-2); }
+.btn-ghost { background: var(--surface-2); color: var(--text-muted); }
+.btn-ghost:hover { background: var(--surface-3); color: var(--text); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #d63055; }
+.btn-sm { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); border-radius: var(--radius-md); }
+.btn-full { width: 100%; }
+
+/* Multiplicateur buttons */
+.btn-mult {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm); font-weight: 800;
+  transition: all var(--transition); border: 2px solid transparent;
+  background: var(--surface-3); color: var(--text-muted);
+}
+.btn-mult.active-x2 { background: rgba(6,214,160,0.15); color: var(--teal); border-color: var(--teal); box-shadow: 0 0 15px var(--teal-glow); }
+.btn-mult.active-x3 { background: rgba(255,209,102,0.15); color: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold-glow); }
+.btn-mult:hover:not(.active-x2):not(.active-x3) { background: var(--surface-2); color: var(--text); }
+
+/* BUST button */
+.btn-bust {
+  background: rgba(239,71,111,0.15); color: var(--red);
+  border: 2px solid rgba(239,71,111,0.4);
+  font-weight: 900; letter-spacing: 0.05em; transition: all var(--transition);
+}
+.btn-bust:hover { background: rgba(239,71,111,0.25); border-color: var(--red); box-shadow: 0 0 20px rgba(239,71,111,0.3); }
+.btn-bust.active { background: rgba(239,71,111,0.3); border-color: var(--red); box-shadow: 0 0 25px rgba(239,71,111,0.4); }
+
+/* =============================================
+   SECTIONS / CARDS
+   ============================================= */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: var(--space-5); box-shadow: var(--shadow-sm);
+}
+.card + .card, .section + .section { margin-top: var(--space-5); }
+.section-title {
+  font-family: var(--font-display); font-size: var(--text-lg);
+  font-weight: 700; color: var(--text); margin-bottom: var(--space-4);
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.section-title .icon { font-size: 1.2em; }
+
+/* =============================================
+   TABS
+   ============================================= */
+.tabs {
+  display: flex; gap: var(--space-2);
+  background: var(--surface-2); border-radius: var(--radius-xl);
+  padding: var(--space-1); margin-bottom: var(--space-6);
+}
+.tab {
+  flex: 1; padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg); font-size: var(--text-sm); font-weight: 700;
+  color: var(--text-muted); text-align: center; transition: all var(--transition);
+}
+.tab.active { background: var(--surface-3); color: var(--text); box-shadow: var(--shadow-sm); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* =============================================
+   PLAYER SETUP
+   ============================================= */
+.add-player-form { display: flex; gap: var(--space-3); align-items: flex-end; flex-wrap: wrap; }
+.form-group { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-width: 150px; }
+.form-group label {
+  font-size: var(--text-xs); font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+}
+.form-input {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4);
+  color: var(--text); font-size: var(--text-sm);
+  transition: border-color var(--transition); width: 100%;
+}
+.form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.form-input::placeholder { color: var(--text-faint); }
+
+/* Emoji picker */
+.emoji-picker-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.emoji-opt {
+  width: 38px; height: 38px; border-radius: var(--radius-lg);
+  background: var(--surface-2); border: 2px solid transparent;
+  font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); cursor: pointer;
+}
+.emoji-opt:hover { background: var(--surface-3); }
+.emoji-opt.selected { border-color: var(--primary); background: rgba(124,92,252,0.15); box-shadow: 0 0 10px var(--primary-glow); }
+
+/* Photo upload */
+.photo-label {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2); border: 1px dashed var(--border);
+  border-radius: var(--radius-lg); cursor: pointer;
+  font-size: var(--text-xs); color: var(--text-muted);
+  transition: all var(--transition); white-space: nowrap;
+}
+.photo-label:hover { border-color: var(--primary); color: var(--primary); }
+#photoInput { display: none; }
+
+/* Player list */
+.players-list { display: flex; flex-direction: column; gap: var(--space-3); }
+.player-chip {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); transition: all var(--transition);
+}
+.player-avatar {
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  background: var(--surface-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0; overflow: hidden;
+}
+.player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.player-name-text { font-weight: 700; font-size: var(--text-sm); flex: 1; }
+.player-score-badge {
+  font-family: var(--font-display); font-size: var(--text-base); font-weight: 700;
+  padding: var(--space-1) var(--space-3);
+  background: rgba(124,92,252,0.15); color: var(--primary);
+  border-radius: var(--radius-full);
+}
+.btn-remove {
+  width: 30px; height: 30px; border-radius: var(--radius-full);
+  background: transparent; color: var(--text-faint);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: all var(--transition);
+}
+.btn-remove:hover { background: rgba(239,71,111,0.15); color: var(--red); }
+
+/* =============================================
+   SCORE ENTRY — MANCHE
+   ============================================= */
+.round-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3);
+}
+.round-badge {
+  font-family: var(--font-display); font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full); font-size: var(--text-sm);
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+.score-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-4);
+}
+.score-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: var(--space-4);
+  transition: all var(--transition);
+}
+.score-card:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.score-card-header {
+  display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4);
+}
+.score-card-avatar {
+  width: 44px; height: 44px; border-radius: var(--radius-full);
+  background: var(--surface-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; flex-shrink: 0; overflow: hidden;
+}
+.score-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.score-card-name { font-weight: 800; font-size: var(--text-sm); }
+.score-card-total {
+  margin-left: auto; font-family: var(--font-display);
+  font-size: var(--text-lg); font-weight: 700; color: var(--primary);
+}
+.score-controls { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* --- Inputs row (Somme + Bonus côte à côte) --- */
+.inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.input-group { display: flex; flex-direction: column; gap: var(--space-1); }
+.input-label {
+  font-size: var(--text-xs); font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.07em; padding-left: var(--space-1);
+}
+/* Champ numérique strict — bloque les lettres via oninput JS + type=number */
+.num-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-3);
+  color: var(--text); font-size: var(--text-base);
+  font-weight: 700; text-align: center;
+  transition: border-color var(--transition);
+  /* Masquer les flèches spinner native */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.num-input::-webkit-inner-spin-button,
+.num-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.num-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.num-input:disabled { opacity: 0.35; cursor: not-allowed; }
+/* Couleur d'accent pour le champ Bonus */
+.num-input.bonus-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,159,28,0.25); }
+
+.mult-row { display: flex; gap: var(--space-2); }
+.options-row { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+.flip7-check-label {
+  display: flex; align-items: center; gap: var(--space-2);
+  cursor: pointer; font-size: var(--text-sm); font-weight: 700;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius-lg); transition: all var(--transition); user-select: none;
+}
+.flip7-check-label:hover { border-color: var(--gold); }
+.flip7-check-label input { display: none; }
+.flip7-check-label.checked {
+  background: rgba(255,209,102,0.1); border-color: var(--gold);
+  color: var(--gold); box-shadow: 0 0 10px var(--gold-glow);
+}
+.flip7-icon { font-size: 1.1rem; }
+
+/* Formule preview */
+.round-preview {
+  text-align: center; font-size: var(--text-xs); font-weight: 700;
+  color: var(--text-muted);
+  padding: var(--space-2) 0 0; border-top: 1px solid var(--border); margin-top: var(--space-2);
+  line-height: 1.6;
+}
+.round-preview .formula { color: var(--text-faint); font-weight: 600; font-size: 0.7rem; }
+.round-preview .gain-val { color: var(--teal); font-size: var(--text-sm); }
+
+/* =============================================
+   CLASSEMENT / LEADERBOARD
+   ============================================= */
+.leaderboard { display: flex; flex-direction: column; gap: var(--space-3); }
+.lb-row {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); transition: all var(--transition);
+}
+.lb-row:first-child {
+  background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(255,107,157,0.1));
+  border-color: rgba(124,92,252,0.3);
+}
+.lb-rank {
+  font-family: var(--font-display); font-weight: 900;
+  font-size: var(--text-lg); color: var(--text-faint); min-width: 30px; text-align: center;
+}
+.lb-rank-1 { color: var(--gold); text-shadow: 0 0 15px var(--gold-glow); }
+.lb-rank-2 { color: #c0c0c0; }
+.lb-rank-3 { color: #cd7f32; }
+.lb-avatar {
+  width: 44px; height: 44px; border-radius: var(--radius-full);
+  background: var(--surface-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0; overflow: hidden;
+}
+.lb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.lb-info { flex: 1; }
+.lb-name { font-weight: 800; font-size: var(--text-sm); }
+.lb-badges { display: flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-1); }
+.badge {
+  font-size: var(--text-xs); padding: 2px var(--space-2);
+  border-radius: var(--radius-full); font-weight: 700;
+  background: var(--surface-3); color: var(--text-muted);
+}
+.badge-special { background: rgba(255,209,102,0.15); color: var(--gold); }
+.badge-danger  { background: rgba(239,71,111,0.15); color: var(--red); }
+.badge-teal    { background: rgba(6,214,160,0.15); color: var(--teal); }
+.badge-purple  { background: rgba(124,92,252,0.15); color: var(--primary); }
+
+/* Progress bar */
+.progress-wrap { flex: 1; display: flex; flex-direction: column; gap: var(--space-1); min-width: 80px; }
+.progress-info { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--text-muted); font-weight: 700; }
+.progress-info .pts { font-family: var(--font-display); font-size: var(--text-sm); color: var(--primary); }
+.progress-track { height: 8px; background: var(--surface-3); border-radius: var(--radius-full); overflow: hidden; }
+.progress-fill {
+  height: 100%; border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.progress-fill.near-win { background: linear-gradient(90deg, var(--gold), var(--orange)); box-shadow: 0 0 8px var(--gold-glow); }
+.progress-fill.winner  { background: linear-gradient(90deg, var(--teal), var(--gold)); box-shadow: 0 0 12px var(--teal-glow); }
+
+/* =============================================
+   HISTORIQUE
+   ============================================= */
+.history-table { width: 100%; border-collapse: collapse; font-size: var(--text-xs); }
+.history-table thead th {
+  text-align: left; padding: var(--space-2) var(--space-3);
+  color: var(--text-muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border);
+}
+.history-table tbody td {
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid rgba(255,255,255,0.04); font-weight: 600;
+}
+.history-table tbody tr:last-child td { border-bottom: none; }
+.history-table tbody tr:hover td { background: var(--surface-2); }
+.score-delta { font-family: var(--font-display); font-weight: 700; }
+.delta-bust { color: var(--red); }
+.delta-zero { color: var(--text-faint); }
+.delta-low  { color: var(--text-muted); }
+.delta-mid  { color: var(--teal); }
+.delta-high { color: var(--gold); }
+.delta-flip { color: var(--accent); }
+
+/* =============================================
+   TOAST
+   ============================================= */
+#toast-container {
+  position: fixed; bottom: var(--space-6); right: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-3);
+  z-index: 9999; pointer-events: none; max-width: 320px;
+}
+.toast {
+  background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 400ms cubic-bezier(0.16,1,0.3,1) forwards;
+  font-size: var(--text-sm); font-weight: 700;
+  display: flex; gap: var(--space-3); align-items: flex-start;
+}
+.toast.out { animation: toastOut 300ms ease forwards; }
+.toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+.toast-msg { flex: 1; line-height: 1.4; }
+@keyframes toastIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+/* =============================================
+   MODAL
+   ============================================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: var(--space-4);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-2xl); padding: var(--space-8);
+  max-width: 420px; width: 100%; box-shadow: var(--shadow-lg);
+  animation: modalIn 400ms cubic-bezier(0.16,1,0.3,1); text-align: center;
+}
+@keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-emoji { font-size: 4rem; margin-bottom: var(--space-4); }
+.modal-title {
+  font-family: var(--font-display); font-size: var(--text-xl);
+  font-weight: 900; margin-bottom: var(--space-3);
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.modal-message { color: var(--text-muted); margin-bottom: var(--space-6); line-height: 1.6; font-size: var(--text-sm); white-space: pre-line; }
+.modal-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; justify-content: center; }
+
+/* =============================================
+   EMPTY STATE
+   ============================================= */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: var(--space-12) var(--space-8);
+  text-align: center; color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.5; }
+.empty-state h3 { color: var(--text); margin-bottom: var(--space-2); font-size: var(--text-base); }
+.empty-state p { font-size: var(--text-sm); max-width: 30ch; }
+
+/* =============================================
+   UTILITY
+   ============================================= */
+.divider { height: 1px; background: var(--border); margin: var(--space-4) 0; }
+.text-muted { color: var(--text-muted); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-4 { margin-top: var(--space-4); }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 600px) {
+  #app { padding: var(--space-3); }
+  .app-header { padding: var(--space-4); }
+  .logo-text { font-size: 1rem; }
+  .tabs .tab { font-size: var(--text-xs); padding: var(--space-2) var(--space-3); }
+  .lb-row { padding: var(--space-3) var(--space-4); }
+  .score-card { padding: var(--space-3); }
+  .modal { padding: var(--space-6); }
+  #toast-container { left: var(--space-4); right: var(--space-4); max-width: 100%; }
+  .inputs-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* Win pulse */
+@keyframes winPulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--gold-glow); }
+  50% { box-shadow: 0 0 30px 10px var(--gold-glow); }
+}
+.lb-row.winner-row { animation: winPulse 2s ease-in-out infinite; border-color: var(--gold) !important; }
+
+/* Animations */
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.animate-in { animation: fadeSlideIn 350ms cubic-bezier(0.16,1,0.3,1); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Flip 7 Score Master logo">
+        <rect width="44" height="44" rx="10" fill="url(#lgrd)"/>
+        <rect x="5" y="8" width="20" height="28" rx="5" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <rect x="19" y="8" width="20" height="28" rx="5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <text x="8" y="27" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="900" fill="white" opacity="0.9">F7</text>
+        <circle cx="34" cy="12" r="5" fill="url(#lgrd2)"/>
+        <text x="34" y="16" font-family="sans-serif" font-size="8" font-weight="900" fill="white" text-anchor="middle">★</text>
+        <defs>
+          <linearGradient id="lgrd" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7c5cfc"/><stop offset="1" stop-color="#ff6b9d"/>
+          </linearGradient>
+          <linearGradient id="lgrd2" x1="29" y1="7" x2="39" y2="17" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#ffd166"/><stop offset="1" stop-color="#ff9f1c"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div>
+        <div class="logo-text">Flip 7 Score Master</div>
+        <div class="logo-sub">🎯 Objectif : 200 pts</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="btnReset" title="Réinitialiser la partie" aria-label="Réinitialiser">🔄</button>
+      <button class="btn-icon" id="btnInfo" title="Règles rapides" aria-label="Règles">❓</button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="setup" role="tab" aria-selected="true">👥 Joueurs</button>
+    <button class="tab" data-tab="round" role="tab" aria-selected="false">🃏 Manche</button>
+    <button class="tab" data-tab="leaderboard" role="tab" aria-selected="false">🏆 Classement</button>
+    <button class="tab" data-tab="history" role="tab" aria-selected="false">📜 Historique</button>
+  </div>
+
+  <!-- TAB: SETUP -->
+  <div class="tab-content active" id="tab-setup">
+    <div class="card">
+      <div class="section-title"><span class="icon">➕</span> Ajouter un joueur</div>
+      <div class="add-player-form">
+        <div class="form-group" style="flex:2;">
+          <label for="playerName">Nom du joueur</label>
+          <input type="text" id="playerName" class="form-input" placeholder="Ex: Yasmine, Ryan…" maxlength="20">
+        </div>
+        <div class="form-group" style="flex:1;min-width:120px;">
+          <label>Avatar</label>
+          <div style="display:flex;gap:var(--space-2);align-items:center;">
+            <label class="photo-label" title="Uploader une photo">
+              📷 Photo
+              <input type="file" id="photoInput" accept="image/*">
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btnAddPlayer" style="align-self:flex-end;">Ajouter</button>
+      </div>
+      <div class="mt-2">
+        <div style="font-size:var(--text-xs);color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--space-2);">Choisir un emoji</div>
+        <div class="emoji-picker-row" id="emojiPicker"></div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="flex-between" style="margin-bottom:var(--space-4);">
+        <div class="section-title" style="margin:0;"><span class="icon">👥</span> Joueurs (<span id="playerCount">0</span>)</div>
+        <button class="btn btn-primary btn-sm" id="btnStartGame" style="display:none;">🎮 Commencer</button>
+      </div>
+      <div class="players-list" id="playersList">
+        <div class="empty-state">
+          <div class="empty-icon">🃏</div>
+          <h3>Aucun joueur</h3>
+          <p>Ajoutez au moins 2 joueurs pour commencer la partie !</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ROUND -->
+  <div class="tab-content" id="tab-round">
+    <div class="card">
+      <div class="round-header">
+        <div class="section-title" style="margin:0;"><span class="icon">🃏</span> Saisie de manche</div>
+        <div class="round-badge" id="roundBadge">Manche 1</div>
+      </div>
+      <div id="scoreCardsGrid" class="score-cards-grid"></div>
+      <div class="divider"></div>
+      <button class="btn btn-primary btn-full" id="btnValidateRound">✅ Valider la manche</button>
+    </div>
+  </div>
+
+  <!-- TAB: LEADERBOARD -->
+  <div class="tab-content" id="tab-leaderboard">
+    <div class="card">
+      <div class="section-title"><span class="icon">🏆</span> Classement en temps réel</div>
+      <div class="leaderboard" id="leaderboardContainer">
+        <div class="empty-state">
+          <div class="empty-icon">🏆</div>
+          <h3>Pas encore de scores</h3>
+          <p>Validez une manche pour voir le classement !</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: HISTORY -->
+  <div class="tab-content" id="tab-history">
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:var(--space-4);">
+        <div class="section-title" style="margin:0;"><span class="icon">📜</span> Historique des manches</div>
+        <button class="btn btn-ghost btn-sm" id="btnExportHistory">⬇️ Export</button>
+      </div>
+      <div id="historyContainer">
+        <div class="empty-state">
+          <div class="empty-icon">📜</div>
+          <h3>Aucune manche jouée</h3>
+          <p>L'historique apparaîtra ici après chaque manche.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-emoji" id="modalEmoji">🏆</div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-message" id="modalMessage"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container" aria-live="polite"></div>
+
+<script>
+/* =============================================
+   FLIP 7 SCORE MASTER — App Logic
+   v2 : champ Bonus, blocage numérique strict,
+        formule = (Somme × Mult) + Bonus + (15 si Flip7)
+   ============================================= */
+
+const GOAL = 200;
+const EMOJIS = ['😄','🐱','🦊','🐸','🎩','🌟','🔥','💎','🦁','🐼','🦋','🎸','🍕','👾','🤖','🐉','🌈','⚡','🍀','🦄'];
+const VICTORY_MSGS = [
+  "LÉGENDAIRE ! Même les dieux du hasard s'inclinent devant toi 🏛️",
+  "200 points ! Tu joues aux cartes ou tu lis les pensées ? 🔮",
+  "VICTOIRE ABSOLUE ! Prépare le trophée, l'avocat et le discours 🏆",
+  "Incroyable ! Tu as battu tout le monde… et probablement le destin 🌌",
+  "200 PTS ! C'est pas du talent, c'est de la magie noire 🧿",
+];
+const BUST_MSGS = [
+  "BUST ! Le deck te déteste personnellement 💀",
+  "Boom ! BUST ! La chance a pris des congés 😭",
+  "BUST ! Même les cartes ont honte pour toi 🃏💔",
+  "Raté ! BUST ! Ton instinct était en mode avion 📵",
+];
+const ENCOURAGE_MSGS = [
+  "Continue, t'es pas le pire… enfin, pas encore 😅",
+  "Allez ! La prochaine manche sera la bonne 💪",
+  "Tu remontes doucement, comme la température un lundi matin ☀️",
+  "On croit en toi ! (On y croit vraiment, promis) 🤞",
+];
+const BADGE_DEFINITIONS = {
+  bigScore:  { icon: '🔥', label: 'Plus gros score', cls: 'badge-special' },
+  smallScore:{ icon: '😬', label: 'Plouf',           cls: '' },
+  flip7:     { icon: '🌟', label: 'Flip 7 !',        cls: 'badge-teal' },
+  bust:      { icon: '💀', label: 'BUST',             cls: 'badge-danger' },
+  comeback:  { icon: '⚡', label: 'Comeback !',       cls: 'badge-purple' },
+  streak:    { icon: '❄️', label: 'Série noire',      cls: 'badge-danger' },
+  doubleMult:{ icon: '✖️', label: '×2',               cls: 'badge-teal' },
+  tripleMult:{ icon: '💥', label: '×3',               cls: 'badge-special' },
+  nearWin:   { icon: '🎯', label: 'Presque !',        cls: 'badge-special' },
+  first200:  { icon: '👑', label: 'VAINQUEUR',        cls: 'badge-special' },
+};
+
+// --- State ---
+let state = {
+  players: [],   // { id, name, emoji, photo, score, badges, bustStreak }
+  rounds: [],    // [ { roundNum, entries: [{pid, sum, bonus, mult, flip7, bust, gain, totalAfter}] } ]
+  currentRound: 1,
+  gameOver: false,
+  winnerId: null,
+};
+// Inputs temporaires par joueur pour la manche en cours (non persistés)
+let roundInputs = {};
+
+// --- Persistance localStorage ---
+function saveState() {
+  try { localStorage.setItem('flip7_v2_state', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem('flip7_v2_state');
+    if (raw) Object.assign(state, JSON.parse(raw));
+  } catch(e) {}
+}
+
+// --- Utilitaires ---
+function uid()  { return Math.random().toString(36).slice(2,9); }
+function rand(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function clamp(v,min,max) { return Math.max(min,Math.min(max,v)); }
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// --- Blocage numérique strict ---
+// Appelée en oninput sur chaque champ numérique de manche.
+// Supprime tout caractère non numérique (virgule, point, lettre, signe négatif…).
+function forceDigits(el) {
+  el.value = el.value.replace(/[^0-9]/g, '');
+}
+
+// --- Emoji Picker ---
+function renderEmojiPicker() {
+  const el = document.getElementById('emojiPicker');
+  el.innerHTML = EMOJIS.map((e,i) =>
+    `<button type="button" class="emoji-opt${i===0?' selected':''}" data-emoji="${e}" aria-label="${e}">${e}</button>`
+  ).join('');
+  el.querySelectorAll('.emoji-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el.querySelectorAll('.emoji-opt').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('photoInput').value = '';
+      state._pendingPhoto = null;
+      const prev = document.getElementById('photoPreview');
+      if(prev) prev.remove();
+    });
+  });
+}
+function getSelectedEmoji() {
+  const sel = document.querySelector('.emoji-opt.selected');
+  return sel ? sel.dataset.emoji : '😄';
+}
+
+// --- Photo Upload ---
+document.getElementById('photoInput').addEventListener('change', function() {
+  if (!this.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state._pendingPhoto = e.target.result;
+    document.querySelectorAll('.emoji-opt').forEach(b=>b.classList.remove('selected'));
+    let prev = document.getElementById('photoPreview');
+    if (!prev) {
+      prev = document.createElement('img');
+      prev.id = 'photoPreview';
+      prev.style.cssText = 'width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);';
+      document.querySelector('.photo-label').after(prev);
+    }
+    prev.src = e.target.result;
+  };
+  reader.readAsDataURL(this.files[0]);
+});
+
+// --- Ajouter un joueur ---
+document.getElementById('btnAddPlayer').addEventListener('click', addPlayer);
+document.getElementById('playerName').addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(); });
+
+function addPlayer() {
+  const nameEl = document.getElementById('playerName');
+  const name = nameEl.value.trim();
+  if (!name) { toast('⚠️','Entre un nom de joueur !'); return; }
+  if (state.players.length >= 12) { toast('⚠️','Maximum 12 joueurs !'); return; }
+  if (state.players.some(p=>p.name.toLowerCase()===name.toLowerCase())) {
+    toast('⚠️','Ce prénom est déjà pris !'); return;
+  }
+  state.players.push({
+    id: uid(), name,
+    emoji: getSelectedEmoji(),
+    photo: state._pendingPhoto || null,
+    score: 0, badges: [], bustStreak: 0,
+  });
+  state._pendingPhoto = null;
+  nameEl.value = '';
+  document.getElementById('photoInput').value = '';
+  const prev = document.getElementById('photoPreview');
+  if(prev) prev.remove();
+  document.querySelectorAll('.emoji-opt').forEach((b,i)=>b.classList.toggle('selected',i===0));
+  saveState(); renderPlayerList(); renderLeaderboard(); renderRoundCards();
+  toast('✅', `${name} a rejoint la partie !`);
+}
+
+// --- Render liste joueurs ---
+function avatarHtml(p) {
+  if (p.photo) return `<img src="${p.photo}" alt="${escHtml(p.name)}" loading="lazy">`;
+  return p.emoji || '😄';
+}
+function renderPlayerList() {
+  const el = document.getElementById('playersList');
+  const count = state.players.length;
+  document.getElementById('playerCount').textContent = count;
+  document.getElementById('btnStartGame').style.display = count >= 2 ? 'inline-flex' : 'none';
+  if (count === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🃏</div><h3>Aucun joueur</h3><p>Ajoutez au moins 2 joueurs !</p></div>`;
+    return;
+  }
+  el.innerHTML = state.players.map(p => `
+    <div class="player-chip animate-in">
+      <div class="player-avatar">${avatarHtml(p)}</div>
+      <div class="player-name-text">${escHtml(p.name)}</div>
+      <div class="player-score-badge">${p.score} pts</div>
+      <button class="btn-remove" data-pid="${p.id}" aria-label="Retirer ${escHtml(p.name)}">✕</button>
+    </div>`).join('');
+  el.querySelectorAll('.btn-remove').forEach(btn =>
+    btn.addEventListener('click', () => {
+      state.players = state.players.filter(p=>p.id!==btn.dataset.pid);
+      saveState(); renderPlayerList(); renderLeaderboard(); renderRoundCards();
+    })
+  );
+}
+
+// --- Tabs ---
+document.getElementById('btnStartGame').addEventListener('click', () => {
+  if (state.players.length < 2) { toast('⚠️','Ajoutez au moins 2 joueurs !'); return; }
+  switchTab('round');
+});
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id==='tab-'+id));
+  if (id==='leaderboard') renderLeaderboard();
+  if (id==='history')     renderHistory();
+  if (id==='round')       renderRoundCards();
+}
+
+// --- Calcul du gain (formule vérifiée) ---
+// Formule : (Somme × Multiplicateur) + Bonus cartes + (15 si Flip 7)
+// Le bonus et le Flip 7 ne sont PAS multipliés.
+function computeGain(ri) {
+  if (ri.bust) return 0;
+  const sum   = parseInt(ri.sum,   10) || 0;
+  const bonus = parseInt(ri.bonus, 10) || 0;
+  return (sum * ri.mult) + bonus + (ri.flip7 ? 15 : 0);
+}
+
+// Texte de la formule pour l'aperçu
+function formulaText(ri) {
+  if (ri.bust) return 'BUST → 0 pt';
+  const sum   = parseInt(ri.sum,   10) || 0;
+  const bonus = parseInt(ri.bonus, 10) || 0;
+  const flip  = ri.flip7 ? 15 : 0;
+  const parts = [];
+  if (ri.mult > 1) parts.push(`(${sum}×${ri.mult})`);
+  else             parts.push(`${sum}`);
+  if (bonus > 0) parts.push(`+${bonus}`);
+  if (flip  > 0) parts.push(`+${flip}🌟`);
+  return parts.join(' ') + ` = ${computeGain(ri)} pts`;
+}
+
+// --- Render cartes de saisie ---
+function renderRoundCards() {
+  const el = document.getElementById('scoreCardsGrid');
+  document.getElementById('roundBadge').textContent = `Manche ${state.currentRound}`;
+  if (state.players.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><h3>Aucun joueur</h3><p>Ajoutez des joueurs dans l'onglet Joueurs.</p></div>`;
+    return;
+  }
+  // Initialiser les inputs pour les nouveaux joueurs
+  state.players.forEach(p => {
+    if (!roundInputs[p.id]) roundInputs[p.id] = { sum:'', bonus:'', mult:1, flip7:false, bust:false };
+  });
+  el.innerHTML = state.players.map(p => buildScoreCard(p)).join('');
+  state.players.forEach(p => bindScoreCard(p));
+}
+
+function buildScoreCard(p) {
+  const ri = roundInputs[p.id];
+  const dis = ri.bust ? 'disabled' : '';
+  return `
+  <div class="score-card" id="scard-${p.id}">
+    <div class="score-card-header">
+      <div class="score-card-avatar">${avatarHtml(p)}</div>
+      <div class="score-card-name">${escHtml(p.name)}</div>
+      <div class="score-card-total">${p.score}</div>
+    </div>
+    <div class="score-controls">
+
+      <!-- Ligne Somme + Bonus (côte à côte) -->
+      <div class="inputs-row">
+        <div class="input-group">
+          <label class="input-label" for="sinput-${p.id}">Somme cartes</label>
+          <input
+            type="number" inputmode="numeric" pattern="[0-9]*"
+            min="0" max="9999" id="sinput-${p.id}"
+            class="num-input" placeholder="0"
+            value="${ri.sum}" ${dis}
+            oninput="forceDigits(this)"
+            aria-label="Somme des cartes pour ${escHtml(p.name)}">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="sbonus-${p.id}">Bonus cartes (+)</label>
+          <input
+            type="number" inputmode="numeric" pattern="[0-9]*"
+            min="0" max="9999" id="sbonus-${p.id}"
+            class="num-input bonus-input" placeholder="0"
+            value="${ri.bonus}" ${dis}
+            oninput="forceDigits(this)"
+            aria-label="Bonus cartes (+5, +10…) pour ${escHtml(p.name)}">
+        </div>
+      </div>
+
+      <!-- Multiplicateurs -->
+      <div class="mult-row">
+        <button type="button" class="btn-mult btn-full${ri.mult===2?' active-x2':''}" id="smult2-${p.id}" ${dis}>✕2</button>
+        <button type="button" class="btn-mult btn-full${ri.mult===3?' active-x3':''}" id="smult3-${p.id}" ${dis}>✕3</button>
+      </div>
+
+      <!-- Flip 7 + BUST -->
+      <div class="options-row">
+        <label class="flip7-check-label${ri.flip7?' checked':''}" id="sflip7label-${p.id}">
+          <input type="checkbox" id="sflip7-${p.id}" ${ri.flip7?'checked':''} ${dis}>
+          <span class="flip7-icon">🌟</span> Flip 7 <span style="color:var(--gold);font-size:var(--text-xs)">(+15)</span>
+        </label>
+        <button type="button" class="btn btn-bust btn-sm${ri.bust?' active':''}" id="sbust-${p.id}">💀 BUST</button>
+      </div>
+
+      <!-- Aperçu formule -->
+      <div class="round-preview">
+        <div class="formula" id="sformula-${p.id}">${formulaText(ri)}</div>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+function bindScoreCard(p) {
+  const sumEl   = document.getElementById(`sinput-${p.id}`);
+  const bonusEl = document.getElementById(`sbonus-${p.id}`);
+  const mult2El = document.getElementById(`smult2-${p.id}`);
+  const mult3El = document.getElementById(`smult3-${p.id}`);
+  const flip7El = document.getElementById(`sflip7-${p.id}`);
+  const flip7LabelEl = document.getElementById(`sflip7label-${p.id}`);
+  const bustEl  = document.getElementById(`sbust-${p.id}`);
+  if (!sumEl) return;
+
+  const update = () => {
+    const ri = roundInputs[p.id];
+    const fEl = document.getElementById(`sformula-${p.id}`);
+    if (fEl) fEl.textContent = formulaText(ri);
+  };
+
+  // Synchro valeur vers state + mise à jour aperçu
+  sumEl.addEventListener('input', () => { roundInputs[p.id].sum = sumEl.value; update(); });
+  bonusEl.addEventListener('input', () => { roundInputs[p.id].bonus = bonusEl.value; update(); });
+
+  // Boutons multiplicateurs (toggle : cliquer à nouveau désactive)
+  mult2El.addEventListener('click', () => {
+    const ri = roundInputs[p.id];
+    ri.mult = ri.mult === 2 ? 1 : 2;
+    mult2El.classList.toggle('active-x2', ri.mult === 2);
+    mult3El.classList.remove('active-x3');
+    if (ri.mult !== 2) roundInputs[p.id].mult = ri.mult; // déjà mis à jour
+    update();
+  });
+  mult3El.addEventListener('click', () => {
+    const ri = roundInputs[p.id];
+    ri.mult = ri.mult === 3 ? 1 : 3;
+    mult3El.classList.toggle('active-x3', ri.mult === 3);
+    mult2El.classList.remove('active-x2');
+    if (ri.mult === 3) roundInputs[p.id].mult = 3;
+    update();
+  });
+
+  // Flip 7 checkbox
+  flip7El.addEventListener('change', () => {
+    roundInputs[p.id].flip7 = flip7El.checked;
+    flip7LabelEl.classList.toggle('checked', flip7El.checked);
+    update();
+  });
+
+  // BUST : force gain = 0 et désactive tous les autres champs
+  bustEl.addEventListener('click', () => {
+    const ri = roundInputs[p.id];
+    ri.bust = !ri.bust;
+    bustEl.classList.toggle('active', ri.bust);
+    [sumEl, bonusEl, mult2El, mult3El, flip7El].forEach(el => el.disabled = ri.bust);
+    if (ri.bust) toast(rand(['💀','☠️']), rand(BUST_MSGS));
+    update();
+  });
+}
+
+// --- Valider la manche ---
+document.getElementById('btnValidateRound').addEventListener('click', validateRound);
+
+function validateRound() {
+  if (state.players.length === 0) { toast('⚠️','Pas de joueurs !'); return; }
+  if (state.gameOver) { toast('🏆','La partie est déjà terminée !'); return; }
+
+  const entries = [];
+  const roundGains = [];
+
+  state.players.forEach(p => {
+    const ri = roundInputs[p.id] || { sum:'', bonus:'', mult:1, flip7:false, bust:false };
+    const gain = computeGain(ri);
+    const totalAfter = p.score + gain;
+    const sum   = parseInt(ri.sum,   10) || 0;
+    const bonus = parseInt(ri.bonus, 10) || 0;
+    entries.push({ pid:p.id, sum, bonus, mult:ri.mult, flip7:ri.flip7, bust:ri.bust, gain, totalAfter });
+    roundGains.push({ pid:p.id, gain });
+  });
+
+  // Calcul des badges de manche
+  const maxGain = Math.max(...roundGains.map(r=>r.gain));
+  const minGain = Math.min(...roundGains.map(r=>r.gain));
+  const roundBadges = {};
+  state.players.forEach(p => { roundBadges[p.id] = []; });
+
+  roundGains.forEach(r => {
+    const ri = roundInputs[r.pid];
+    if (ri.bust)                      roundBadges[r.pid].push('bust');
+    if (ri.flip7 && !ri.bust)         roundBadges[r.pid].push('flip7');
+    if (ri.mult === 2 && !ri.bust)    roundBadges[r.pid].push('doubleMult');
+    if (ri.mult === 3 && !ri.bust)    roundBadges[r.pid].push('tripleMult');
+    if (r.gain === maxGain && maxGain > 0) roundBadges[r.pid].push('bigScore');
+    if (r.gain === minGain && roundGains.length > 1 && r.gain < maxGain) roundBadges[r.pid].push('smallScore');
+  });
+
+  // Mise à jour des scores + séries
+  entries.forEach(e => {
+    const p = state.players.find(p=>p.id===e.pid);
+    const prevScore = p.score;
+    p.score = e.totalAfter;
+    p.bustStreak = e.bust ? (p.bustStreak||0)+1 : 0;
+    if (p.bustStreak >= 2)                              roundBadges[p.id].push('streak');
+    if (p.score >= GOAL*0.75 && p.score < GOAL)        roundBadges[p.id].push('nearWin');
+    if (prevScore < GOAL/2 && e.gain > 30)              roundBadges[p.id].push('comeback');
+    p.badges = roundBadges[p.id];
+  });
+
+  state.rounds.push({ roundNum: state.currentRound, entries });
+  state.currentRound++;
+
+  // Vérification victoire
+  const winner = state.players.find(p => p.score >= GOAL);
+  if (winner) {
+    winner.badges.push('first200');
+    state.gameOver = true;
+    state.winnerId = winner.id;
+    saveState(); resetRoundInputs(); renderAll();
+    triggerWinCelebration(winner);
+    return;
+  }
+
+  saveState(); resetRoundInputs(); renderAll();
+
+  // Toast d'encouragement pour le dernier
+  const last = [...state.players].sort((a,b)=>a.score-b.score)[0];
+  if (last && last.score < 40 && state.currentRound > 2) {
+    toast('💬', `${last.name} : ${rand(ENCOURAGE_MSGS)}`);
+  }
+  toast('✅', `Manche ${state.currentRound-1} validée !`);
+}
+
+function resetRoundInputs() {
+  state.players.forEach(p => { roundInputs[p.id] = { sum:'', bonus:'', mult:1, flip7:false, bust:false }; });
+}
+function renderAll() {
+  renderPlayerList(); renderLeaderboard(); renderRoundCards(); renderHistory();
+}
+
+// --- Leaderboard ---
+function renderLeaderboard() {
+  const el = document.getElementById('leaderboardContainer');
+  if (state.players.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏆</div><h3>Pas encore de scores</h3><p>Validez une manche pour voir le classement !</p></div>`;
+    return;
+  }
+  const sorted = [...state.players].sort((a,b)=>b.score-a.score);
+  el.innerHTML = sorted.map((p,i) => {
+    const rank = i+1;
+    const pct  = clamp((p.score/GOAL)*100, 0, 100);
+    const rankEmoji = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const rankCls   = rank===1?'lb-rank-1':rank===2?'lb-rank-2':rank===3?'lb-rank-3':'';
+    const fillCls   = pct>=100?'winner':pct>=75?'near-win':'';
+    const winnerCls = p.id===state.winnerId?' winner-row':'';
+    const badgesHtml = (p.badges||[]).map(b=>{
+      const bd=BADGE_DEFINITIONS[b];
+      return bd?`<span class="badge ${bd.cls}">${bd.icon} ${bd.label}</span>`:'';
+    }).join('');
+    return `
+    <div class="lb-row${winnerCls}">
+      <div class="lb-rank ${rankCls}">${rankEmoji}</div>
+      <div class="lb-avatar">${avatarHtml(p)}</div>
+      <div class="lb-info">
+        <div class="lb-name">${escHtml(p.name)}</div>
+        ${badgesHtml?`<div class="lb-badges">${badgesHtml}</div>`:''}
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span class="pts">${p.score}</span><span>${GOAL} pts</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill ${fillCls}" style="width:${pct}%"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- Historique ---
+function renderHistory() {
+  const el = document.getElementById('historyContainer');
+  if (state.rounds.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><h3>Aucune manche jouée</h3><p>L'historique apparaîtra ici après chaque manche.</p></div>`;
+    return;
+  }
+  const headers = state.players.map(p=>`<th>${avatarHtml(p)}<br>${escHtml(p.name)}</th>`).join('');
+  const rows = [...state.rounds].reverse().map(r => {
+    const cells = state.players.map(p => {
+      const e = r.entries.find(e=>e.pid===p.id);
+      if (!e) return '<td>—</td>';
+      let cls='delta-zero', label='+0';
+      if (e.bust)       { cls='delta-bust'; label='BUST'; }
+      else if (e.gain>50){ cls='delta-flip'; label=`+${e.gain}`; }
+      else if (e.gain>30){ cls='delta-high'; label=`+${e.gain}`; }
+      else if (e.gain>15){ cls='delta-mid';  label=`+${e.gain}`; }
+      else if (e.gain>0) { cls='delta-low';  label=`+${e.gain}`; }
+      const extras = [
+        e.flip7 ? '🌟':'',
+        e.mult>1 ? `✕${e.mult}`:'',
+        e.bonus>0? `+${e.bonus}🎁`:'',
+      ].filter(Boolean).join(' ');
+      return `<td><span class="score-delta ${cls}">${label}</span><br>
+        <small style="color:var(--text-faint)">(${e.totalAfter}pts) ${extras}</small></td>`;
+    }).join('');
+    return `<tr><td><strong>M${r.roundNum}</strong></td>${cells}</tr>`;
+  }).join('');
+  el.innerHTML = `<div style="overflow-x:auto;">
+    <table class="history-table">
+      <thead><tr><th>#</th>${headers}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+// --- Célébration victoire ---
+function triggerWinCelebration(winner) {
+  const colors = ['#7c5cfc','#ff6b9d','#ffd166','#06d6a0','#ff9f1c'];
+  confetti({ particleCount:200, spread:100, origin:{y:0.5}, colors });
+  setTimeout(()=>confetti({ particleCount:120, angle:60,  spread:80, origin:{x:0}, colors }), 500);
+  setTimeout(()=>confetti({ particleCount:120, angle:120, spread:80, origin:{x:1}, colors }), 700);
+  setTimeout(()=>confetti({ particleCount:80, spread:180, startVelocity:60, origin:{y:0.3}, colors }), 1200);
+  showModal({
+    emoji: '🏆',
+    title: `${winner.name} GAGNE !`,
+    message: rand(VICTORY_MSGS) + `\n\n${winner.score} points en ${state.currentRound-1} manches.`,
+    actions: [
+      { label:'🎮 Nouvelle partie', cls:'btn-primary', cb: newGame },
+      { label:'📊 Classement', cls:'btn-outline', cb:()=>{ closeModal(); switchTab('leaderboard'); } },
+    ],
+  });
+  switchTab('leaderboard');
+}
+
+// --- Modal ---
+function showModal({ emoji, title, message, actions }) {
+  document.getElementById('modalEmoji').textContent = emoji;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').textContent = message;
+  const actEl = document.getElementById('modalActions');
+  actEl.innerHTML = actions.map((_,i)=>
+    `<button class="btn ${actions[i].cls}" id="mact-${i}">${actions[i].label}</button>`
+  ).join('');
+  actions.forEach((_,i)=>
+    document.getElementById(`mact-${i}`).addEventListener('click',()=>{ closeModal(); actions[i].cb&&actions[i].cb(); })
+  );
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target===document.getElementById('modalOverlay')) closeModal();
+});
+
+// --- Réinitialisation ---
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  showModal({
+    emoji:'🔄', title:'Réinitialiser ?',
+    message:'Effacer toute la partie et les scores ?',
+    actions:[
+      { label:'💥 Oui, effacer', cls:'btn-danger', cb: newGame },
+      { label:'Annuler', cls:'btn-outline', cb:null },
+    ],
+  });
+});
+function newGame() {
+  state.players.forEach(p=>{ p.score=0; p.badges=[]; p.bustStreak=0; });
+  state.rounds=[]; state.currentRound=1; state.gameOver=false; state.winnerId=null;
+  resetRoundInputs(); saveState(); renderAll(); switchTab('setup');
+  toast('🎮','Nouvelle partie lancée ! Bonne chance 🃏');
+}
+
+// --- Info ---
+document.getElementById('btnInfo').addEventListener('click', ()=>{
+  showModal({
+    emoji:'ℹ️', title:'Règles Flip 7',
+    message:
+      '🎯 Objectif : atteindre 200 pts\n\n' +
+      '📐 Formule du gain :\n' +
+      '  (Somme × Mult) + Bonus + Flip7\n\n' +
+      '➕ Somme : total de tes cartes numérotées\n' +
+      '🎁 Bonus (+) : cartes +5, +10, etc. (non multipliées)\n' +
+      '✕2 / ✕3 : multiplie uniquement la Somme\n' +
+      '🌟 Flip 7 : +15 pts fixes (non multipliés)\n' +
+      '💀 BUST : 0 pt pour cette manche\n\n' +
+      '🏆 Le premier à 200 pts gagne !',
+    actions:[{ label:'Compris !', cls:'btn-primary', cb:null }],
+  });
+});
+
+// --- Export CSV ---
+document.getElementById('btnExportHistory').addEventListener('click', ()=>{
+  if (state.rounds.length===0){ toast('⚠️','Aucune manche à exporter !'); return; }
+  let csv = 'Manche,' + state.players.map(p=>p.name).join(',') + '\n';
+  state.rounds.forEach(r=>{
+    const row=[r.roundNum];
+    state.players.forEach(p=>{
+      const e=r.entries.find(e=>e.pid===p.id);
+      row.push(e?(e.bust?'BUST':`+${e.gain}`):'0');
+    });
+    csv+=row.join(',')+'\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='flip7_scores.csv'; a.click();
+  toast('✅','Historique exporté en CSV !');
+});
+
+// --- Toast ---
+function toast(icon, msg, duration=3500) {
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); }, duration);
+}
+
+// --- INIT ---
+loadState();
+renderEmojiPicker();
+renderAll();
+document.getElementById('btnStartGame').style.display = state.players.length>=2?'inline-flex':'none';
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
